@@ -54,3 +54,24 @@ plt.legend(loc="upper right")
 plt.axis("equal")
 plt.title("Netflix Kind Distribution")
 plt.show()
+
+#-----------------------------------------------------------------#
+
+# PART 2 WITH GRAPH COMPARING DIGITAL AND VIDEO MOVIES RATINGS
+# get the mean of digital and video movie ratings
+movie_rating = netflix_clean.loc[netflix_clean["kind"] == "movie", "rating"]
+video_rating = netflix_clean.loc[netflix_clean["kind"] == "video movie", "rating"]
+movie_rating_mean = movie_rating.mean()
+video_rating_mean = video_rating.mean()
+
+# define parameters
+labels = ["Digital Movies", "Video Movies"]
+ratings = [movie_rating_mean, video_rating_mean]
+
+# graph bar chart
+plt.bar(labels, ratings, color="blue", alpha=0.5, align="center")
+plt.title("Digital Movie vs Video Movie Ratings")
+plt.xlabel("Movie Type")
+plt.ylabel("IMDB Ratings")
+plt.ylim(0,10)
+plt.show()
