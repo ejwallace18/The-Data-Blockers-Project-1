@@ -1,0 +1,53 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Import imdb.csv file as DataFrame
+netflix_pd = pd.read_csv("../Resources/archive/IMDB-Movie-Data.csv")
+netflix_pd.head()
+
+# remove duplicate movies
+netflix_pd.drop_duplicates(subset ="Title", keep = "first", inplace = True)
+
+# loc to year
+netflix_runtime = netflix_pd[["Title","Year","Rating","Runtime (Minutes)"]]
+
+# drop NAN in reduced data set
+netflix_runtime = netflix_runtime.dropna(how="any")
+
+# bin together runtimes
+bins = [0, 59.99, 74.99, 89.99, 104.99, 119.99, 134.99, 149.99, 300]
+bin_names = ["Less than 60", "60-75", "75-90", "90-105", "105-120", "120-135", "135-150", "More than 150"]
+
+netflix_pd["Runtime Group (Minutes)"] = pd.cut(netflix_runtime["Runtime (Minutes)"], bins, labels=bin_names, include_lowest=True)
+
+# theres a better way to do this BUT...
+# get the mean rating of each bin
+less_hour_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "Less than 60", "Rating"]
+hour_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "60-75", "Rating"]
+hour_15_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "75-90", "Rating"]
+hour_30_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "90-105", "Rating"]
+hour_45_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "105-120", "Rating"]
+two_hour_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "120-135", "Rating"]
+two_hour_15_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "135-150", "Rating"]
+over_hour_rating = netflix_pd.loc[netflix_pd["Runtime Group (Minutes)"] == "More than 150", "Rating"]
+
+less_hour_rating_mean = less_hour_rating.mean()
+hour_rating_mean = hour_rating.mean()
+hour_15_rating_mean = hour_15_rating.mean()
+hour_30_rating_mean = hour_30_rating.mean()
+hour_45_rating_mean = hour_45_rating.mean()
+two_hour_rating_mean = two_hour_rating.mean()
+two_hour_15_rating_mean = two_hour_15_rating.mean()
+over_hour_rating_mean = over_hour_rating.mean()
+
+# define parameters
+labels = ["Less than 60", "60-75", "75-90", "90-105", "105-120", "120-135", "135-150", "More than 150"]
+ratings = [0, hour_rating_mean, hour_15_rating_mean, hour_30_rating_mean, hour_45_rating_mean, two_hour_rating_mean, two_hour_15_rating_mean, over_hour_rating_mean]
+
+# graph bar chart
+plt.bar(labels, ratings, color="red", alpha=0.5, align="center")
+plt.title("Runtime Ratings")
+plt.xlabel("Runtime Bins (Minutes)")
+plt.ylabel("Ratings")
+plt.ylim(0, 10)
+plt.xticks(rotation=75)
