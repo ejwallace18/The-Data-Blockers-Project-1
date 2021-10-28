@@ -1,0 +1,43 @@
+import warnings
+warnings.filterwarnings('ignore')
+%matplotlib inline
+import pandas as pd
+from matplotlib import pyplot as plt
+import numpy as np
+import scipy.stats as stats
+
+# import CSV file
+df = pd.read_csv("../Archive/IMDB-Movie-Data.csv")
+
+# clean data set
+df.drop_duplicates(subset ="Title", keep = "first", inplace = True)
+statistics_df = df[["Title","Year","Rating","Runtime (Minutes)"]]
+statistics_df = statistics_df.dropna(how="any")
+
+# define variables 
+# bin runtimes and get their ratings
+population1 = df[df["Runtime (Minutes)"] < 111]
+population_rating1 = population1["Rating"]
+population2 = df[df["Runtime (Minutes)"] >= 111]
+population2 = population2.drop(labels=9, axis=0)
+population_rating2 = population2["Rating"]
+
+# create list based off of len of populations
+population1_len = list(range(0,len(population_rating1)))
+population2_len = list(range(0,len(population_rating2)))
+
+# graph scatterplot
+plt.subplot(2, 1, 1)
+plt.scatter(population1_len, population_rating1, label="population_rating1")
+plt.scatter(population2_len, population_rating2, label="population_rating2")
+plt.legend()
+
+# graph histogram
+plt.subplot(2, 1, 2)
+plt.hist(population_rating1, 10, density=True, alpha=0.7, label="population_rating1")
+plt.hist(population_rating2, 10, density=True, alpha=0.7, label="population_rating2")
+plt.axvline(population_rating1.mean(), color='k', linestyle='dashed', linewidth=1)
+plt.axvline(population_rating2.mean(), color='k', linestyle='dashed', linewidth=1)
+plt.legend()  
+
+stats.ttest_ind(population_rating1, population_rating2, equal_var=False)
